@@ -26,10 +26,8 @@ argument_file=./arguments.sh
 . $argument_file
 
 # Set up environment and modules for SQuIRE
-echo 'Setting up environment'
-source activate $virtual_env
-
-
+#echo 'Setting up environment'
+#source activate $virtual_env
 
 # Run SQuIRE Build
 echo 'Running Clean'
