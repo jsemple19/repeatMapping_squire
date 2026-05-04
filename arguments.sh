@@ -70,7 +70,7 @@ verbosity="--verbosity"
 
 SQUIRE_SIF=/mnt/external.data/MeisterLab/containers/squire_latest.sif
 WORK_DIR=/mnt/external.data/MeisterLab/FischleLab_KarthikEswara/ribo0seq_squire
-
+echo "read arguments file"
 
 fetch_folder=squire_fetch
 clean_folder=squire_clean

@@ -8,8 +8,8 @@
 
 #SBATCH --job-name=map
 #SBATCH --time=2-00:00:00
-#SBATCH --cpus-per-task=8
-#SBATCH --array=6%10
+#SBATCH --cpus-per-task=12
+#SBATCH --array=2-3%10
 #SBATCH --mem-per-cpu=8G
 
 argument_file=./arguments.sh
