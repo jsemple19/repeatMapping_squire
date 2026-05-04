@@ -72,10 +72,10 @@ SQUIRE_SIF=/mnt/external.data/MeisterLab/containers/squire_latest.sif
 WORK_DIR=/mnt/external.data/MeisterLab/FischleLab_KarthikEswara/ribo0seq_squire
 echo "read arguments file"
 
-fetch_folder=squire_fetch
-clean_folder=squire_clean
-map_folder=squire_map
-count_folder=squire_count
-draw_folder=squire_draw
-call_folder=squire_call
-seek_folder=squire_seek
+fetch_folder=$WORK_DIR/squire_fetch
+clean_folder=$WORK_DIR/squire_clean
+map_folder=$WORK_DIR/squire_map
+count_folder=$WORK_DIR/squire_count
+draw_folder=$WORK_DIR/squire_draw
+call_folder=$WORK_DIR/squire_call
+seek_folder=$WORK_DIR/squire_seek

@@ -22,32 +22,16 @@ SAMPLE_SHEET=$WORK_DIR/samplesheet.csv
 echo "My SLURM_ARRAY_TASK_ID: " $SLURM_ARRAY_TASK_ID
 
 # get inputs from samplesheet.csv
-#sample_names=$( tail -n +2 $SAMPLE_SHEET | cut -d',' -f1 | sort -u )
 mapfile -t sample_names < <(tail -n +2 "$SAMPLE_SHEET" | cut -d',' -f1 | sort -u)
 
 sample_num=$((SLURM_ARRAY_TASK_ID - 1))
 sample_name=${sample_names[$sample_num]}
 
-#line=$(sed -n "${line_num}p" $SAMPLE_SHEET)
-#IFS=',' read -r -a sample_data <<< "$line"
-
 #Load arguments
 echo 'Loading arguments'
-# r1file=$1
-# basename=${r1file//}
-# basename=$2
-# argument_file=$3
-# r2file=$4
 
-#r1file=$( grep "^${sample_name}," samplesheet.csv | cut -d',' -f2 )
-#r2file=$( grep "^${sample_name}," samplesheet.csv | cut -d',' -f3 )
-
-mapfile -t r1file < <(grep "^${sample_name}," samplesheet.csv | cut -d',' -f2)
-mapfile -t r2file < <(grep "^${sample_name}," samplesheet.csv | cut -d',' -f3)
-
-#r2file=${sample_data[1]}
-#r2file=${sample_data[2]}
-filebasename=$sample_name
+mapfile -t r1file < <(grep "^${sample_name}," "$SAMPLE_SHEET" | cut -d',' -f2)
+mapfile -t r2file < <(grep "^${sample_name}," "$SAMPLE_SHEET" | cut -d',' -f3)
 
 # get directories of all files so they can be bound to container
 bind_args=()
@@ -76,36 +60,36 @@ if [[ $r2file != 'False' ]]
 then
 
   if [ -z $non_reference ]; then
-    if singularity exec --bind "$WORK_DIR" "${bind_args[@]}" "$SQUIRE_SIF" squire Map --read1 "$r1_args" --read2 "$r2_args" --map_folder $map_folder --read_length $read_length --fetch_folder $fetch_folder --pthreads $pthreads --build $build --name $filebasename $verbosity
+    if singularity exec --bind "$WORK_DIR" "${bind_args[@]}" "$SQUIRE_SIF" squire Map --read1 "$r1_args" --read2 "$r2_args" --map_folder $map_folder --read_length $read_length --fetch_folder $fetch_folder --pthreads $pthreads --build $build --name $sample_name $verbosity
     then
-      echo $filebasename >> success_map_$projectname.txt
+      echo $sample_name >> success_map_$projectname.txt
     else
-      echo $filebasename >> fail_map_$projectname.txt
+      echo $sample_name >> fail_map_$projectname.txt
     fi
   else
-    if singularity exec --bind "$WORK_DIR" "${bind_args[@]}" "$SQUIRE_SIF" squire Map --read1 "$r1_args" --read2 "$r2_args" --map_folder $map_folder --read_length $read_length --fetch_folder $fetch_folder --extra $non_reference --pthreads $pthreads --build $build --name $filebasename $verbosity
+    if singularity exec --bind "$WORK_DIR" "${bind_args[@]}" "$SQUIRE_SIF" squire Map --read1 "$r1_args" --read2 "$r2_args" --map_folder $map_folder --read_length $read_length --fetch_folder $fetch_folder --extra $non_reference --pthreads $pthreads --build $build --name $sample_name $verbosity
     then
-      echo $filebasename >> success_map_$projectname.txt
+      echo $sample_name >> success_map_$projectname.txt
     else
-      echo $filebasename >> fail_map_$projectname.txt
+      echo $sample_name >> fail_map_$projectname.txt
     fi
   fi
 
 elif [[ $r2file = 'False' ]]
 then
   if [ -z $non_reference ]; then
-    if singularity exec --bind "$WORK_DIR" "${bind_args[@]}" "$SQUIRE_SIF"  squire Map --read1 "$r1_args" --map_folder $map_folder --read_length $read_length --fetch_folder $fetch_folder --pthreads $pthreads --build $build --name $filebasename $verbosity
+    if singularity exec --bind "$WORK_DIR" "${bind_args[@]}" "$SQUIRE_SIF"  squire Map --read1 "$r1_args" --map_folder $map_folder --read_length $read_length --fetch_folder $fetch_folder --pthreads $pthreads --build $build --name $sample_name $verbosity
     then
-      echo $filebasename >> success_map_$projectname.txt
+      echo $sample_name >> success_map_$projectname.txt
     else
-      echo $filebasename >> fail_map_$projectname.txt
+      echo $sample_name >> fail_map_$projectname.txt
     fi
   else
-    if singularity exec --bind "$WORK_DIR" "${bind_args[@]}" "$SQUIRE_SIF"  squire Map --read1 "$r1_args" --map_folder $map_folder --read_length $read_length --fetch_folder $fetch_folder --extra $non_reference --pthreads $pthreads --build $build --name $filebasename $verbosity
+    if singularity exec --bind "$WORK_DIR" "${bind_args[@]}" "$SQUIRE_SIF"  squire Map --read1 "$r1_args" --map_folder $map_folder --read_length $read_length --fetch_folder $fetch_folder --extra $non_reference --pthreads $pthreads --build $build --name $sample_name $verbosity
     then
-      echo $filebasename >> success_map_$projectname.txt
+      echo $sample_name >> success_map_$projectname.txt
     else
-      echo $filebasename >> fail_map_$projectname.txt
+      echo $sample_name >> fail_map_$projectname.txt
     fi
   fi
 
