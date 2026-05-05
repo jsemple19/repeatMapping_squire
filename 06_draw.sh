@@ -1,17 +1,18 @@
 #! /usr/bin/bash
 ######################################################
-# Bash script count.sh to run squire Count jobs
+# Bash script count.sh to run individual squire Draw jobs
 # using input file arguments.sh
 # Last update: 2018_01_12
 # cpacyna
 ######################################################
 
-#SBATCH --job-name=count
+#SBATCH --job-name=draw
 #SBATCH --time=1-00:00:00
-#SBATCH --cpus-per-task=2
-#SBATCH --array=2-28%9
-#SBATCH --mem-per-cpu=16G
+#SBATCH --cpus-per-task=4
+#SBATCH --array=2-10,12-28%5
+#SBATCH --mem-per-cpu=2G
 
+#Load arguments
 argument_file=./arguments.sh
 . $argument_file
 
@@ -28,24 +29,11 @@ mapfile -t sample_names < <(tail -n +2 "$SAMPLE_SHEET" | cut -d',' -f1 | sort -u
 sample_num=$((SLURM_ARRAY_TASK_ID - 1))
 sample_name=${sample_names[$sample_num]}
 
-
-# Run SQuIRE Count
-echo 'Running Count'
-if [ -z $tempfolder ]
+# Run SQuIRE Draw
+echo 'Running Draw'
+if singularity exec "$SQUIRE_SIF" squire Draw --map_folder $map_folder --draw_folder $draw_folder --name $sample_name --normlib $normlib --pthreads $pthreads --strandedness $strandedness $verbosity -b $build
 then
-  temp_folder=$count_folder
+  echo 'Draw is complete'
 fi
 
-if [ -z $EM ]
-then
-  EM="auto"
-fi
-
-
-
-singularity exec "$SQUIRE_SIF" squire Count --map_folder $map_folder --clean_folder $clean_folder --count_folder $count_folder --temp_folder $temp_folder --name $sample_name --build $build --strandedness $strandedness --EM $EM $verbosity --pthreads $pthreads -r $read_length
-
-
-echo 'Count Complete on' `date`
-
-# count.sh
+# draw.sh
