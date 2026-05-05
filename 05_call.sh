@@ -6,10 +6,10 @@
 # cpacyna
 ######################################################
 
-#SBATCH --job-name=count
-#SBATCH --time=2-00:00:00
+#SBATCH --job-name=call
+#SBATCH --time=0-5:00:00
 #SBATCH --cpus-per-task=4
-#SBATCH --array=1-28%9
+#SBATCH --array=2-13
 #SBATCH --mem-per-cpu=2G
 
 argument_file=./arguments.sh
@@ -36,18 +36,21 @@ echo 'Loading arguments'
 mapfile -t ctrl_group < <(grep "^${contrast_name}," "$CONTRASTS" | cut -d',' -f3)
 mapfile -t treat_group < <(grep "^${contrast_name}," "$CONTRASTS" | cut -d',' -f4)
 
-ctrl_samples=$(awk -F',' -v m=$ctrl_group '$6 == m { print $1 }' ${SAMPLE_SHEET} | sort -u)
+mapfile -t ctrl_samples < <(awk -F',' -v m="$ctrl_group" '$6 == m { print $1 }' "$SAMPLE_SHEET" | sort -u)
+mapfile -t treat_samples < <(awk -F',' -v m="$treat_group" '$6 == m { print $1 }' "$SAMPLE_SHEET" | sort -u)
 
-treat_samples=$(awk -F',' -v m=$treat_group '$6 == m { print $1 }' ${SAMPLE_SHEET} | sort -u) 
 
-# convert file list to comma separated string
+# convert sample list to comma separated string
 IFS=',' group1="${treat_samples[*]}"
 IFS=',' group2="${ctrl_samples[*]}"
 
 
+mkdir -p $call_foler/$contrast_name
+
 # Run SQuIRE Call
+# note, need to use --cleanevn to stop the container from using the local R version
 echo 'Running Call'
-if singularity exec "$SQUIRE_SIF" squire Call --group1 $group1 --group2 $group2 --condition1 $treat_group --condition2 $ctrl_group --projectname $contrast_name --pthreads $pthreads --output_format $output_format  --call_folder $call_folder $verbosity
+if singularity exec --cleanenv "$SQUIRE_SIF" squire Call --group1 "$group1" --group2 "$group2" --condition1 $treat_group --condition2 $ctrl_group --projectname $contrast_name --pthreads $pthreads --output_format $output_format  --call_folder $call_folder/$contrast_name $verbosity
 then
   echo 'squire Call is complete'
 fi

@@ -59,7 +59,7 @@ condition1=
 condition2=
 #Name of condition for group 2 in squire Call
 
-output_format=
+output_format=pdf
 #Desired output of figures as html or pdf
 
 normlib="--normlib"
