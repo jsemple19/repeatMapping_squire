@@ -9,8 +9,8 @@
 #SBATCH --job-name=call
 #SBATCH --time=0-5:00:00
 #SBATCH --cpus-per-task=4
-#SBATCH --array=2-13
-#SBATCH --mem-per-cpu=2G
+#SBATCH --array=8
+#SBATCH --mem-per-cpu=4G
 
 argument_file=./arguments.sh
 . $argument_file
@@ -29,6 +29,7 @@ mapfile -t contrast_names < <(tail -n +2 "$CONTRASTS" | cut -d',' -f1)
 
 contrast_num=$((SLURM_ARRAY_TASK_ID - 1))
 contrast_name=${contrast_names[$contrast_num]}
+echo "Contrast name: " $contrast_name
 
 #Load arguments
 echo 'Loading arguments'

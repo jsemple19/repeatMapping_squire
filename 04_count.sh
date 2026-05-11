@@ -9,7 +9,7 @@
 #SBATCH --job-name=count
 #SBATCH --time=1-00:00:00
 #SBATCH --cpus-per-task=2
-#SBATCH --array=2-28%9
+#SBATCH --array=25-27%9
 #SBATCH --mem-per-cpu=16G
 
 argument_file=./arguments.sh
@@ -23,11 +23,12 @@ echo "My SLURM_ARRAY_TASK_ID: " $SLURM_ARRAY_TASK_ID
 
 # get sample names
 SAMPLE_SHEET=$WORK_DIR/samplesheet.csv
-mapfile -t sample_names < <(tail -n +2 "$SAMPLE_SHEET" | cut -d',' -f1 | sort -u)
+#mapfile -t sample_names < <(tail -n +2 "$SAMPLE_SHEET" | cut -d',' -f1 | sort -u)
+mapfile -t sample_names < <( awk -F',' 'NR>1 && !seen[$1]++ { print $1 }' "$SAMPLE_SHEET")
 
 sample_num=$((SLURM_ARRAY_TASK_ID - 1))
 sample_name=${sample_names[$sample_num]}
-
+echo "Sample name: " $sample_name
 
 # Run SQuIRE Count
 echo 'Running Count'

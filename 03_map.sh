@@ -9,7 +9,7 @@
 #SBATCH --job-name=map
 #SBATCH --time=2-00:00:00
 #SBATCH --cpus-per-task=12
-#SBATCH --array=2-3%10
+#SBATCH --array=25-27%10
 #SBATCH --mem-per-cpu=8G
 
 argument_file=./arguments.sh
@@ -22,10 +22,12 @@ SAMPLE_SHEET=$WORK_DIR/samplesheet.csv
 echo "My SLURM_ARRAY_TASK_ID: " $SLURM_ARRAY_TASK_ID
 
 # get inputs from samplesheet.csv
-mapfile -t sample_names < <(tail -n +2 "$SAMPLE_SHEET" | cut -d',' -f1 | sort -u)
+#mapfile -t sample_names < <(tail -n +2 "$SAMPLE_SHEET" | cut -d',' -f1 | sort -u)
+mapfile -t sample_names < <( awk -F',' 'NR>1 && !seen[$1]++ { print $1 }' "$SAMPLE_SHEET")
 
 sample_num=$((SLURM_ARRAY_TASK_ID - 1))
 sample_name=${sample_names[$sample_num]}
+echo "Sample name: " $sample_name
 
 #Load arguments
 echo 'Loading arguments'
@@ -48,6 +50,9 @@ done
 IFS=',' r1_args="${r1file[*]}"
 IFS=',' r2_args="${r2file[*]}"
 
+
+echo "Read1 files: " ${r1file[@]}
+echo "Read2 files: " ${r2file[@]}
 
 # Set up environment and modules for SQuIRE
 echo 'Setting up environment'
